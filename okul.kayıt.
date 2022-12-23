@@ -1,0 +1,136 @@
+class OkulKayıt():
+    def __init__(self):
+        import sqlite3
+        self.vt = sqlite3.connect("okul_kayıt_02.db")
+        self.im = self.vt.cursor()
+        self.im.execute("""CREATE TABLE IF NOT EXISTS 
+                   (kullanıcı_adı TEXT NOT NULL UNIQUE)
+                   """)
+        self.im.execute("""CREATE TABLE IF NOT EXISTS kayıt_tablo
+                   (sıra INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+                    ad_soyad TEXT NOT NULL,
+                    telefon TEXT NOT NULL,
+                    yas TEXT NOT NULL,
+                    tc_no TEXT NOT NULL,
+                    adres TEXT)
+                   """)
+    def seçim(self):
+        try:
+            print("1- Kayıt Ekle")
+            print("2- Kayıt Sil")
+            print("3- Listele")
+            print("4- Bul")
+            print("5- Sutun Ekle")
+            print("6- Sutun Sil")
+            print("7- Güncelle")
+            print("99- Çıkış")
+            seç = input("Seçiminiz: ")
+            if seç == "1":
+                self.ekle()
+            elif seç == "2":
+                self.sil()
+            elif seç == "3":
+                self.listele()
+            elif seç == "4":
+                self.bul()
+            elif seç == "5":
+                self.sutun_ekle()
+            elif seç == "6":
+                self.sutun_sil()
+            elif seç == "7":
+                self.guncelle()
+            elif seç == "99":
+                self.çıkış()
+            else:
+                self.seçim()
+        except:
+            print("Program sonlandırıldı")
+            self.çıkış()
+    def ekle(self):
+        ad_soyad = input("Adı Soyadı: ")
+        telefonu = input("Telefon: ")
+        yas      = input("Yas: ")
+        tc_no    = input("Tc no: ")
+        adresi   = input("Adres: ")
+        try:
+            self.im.execute("""
+                INSERT INTO telefon_tablo ('ad_soyad', 'telefon', 'yas', 'tc_no', 'adres')
+                VALUES (?, ?, ?) """, (ad_soyad, telefonu, yas, tc_no, adresi))
+            self.vt.commit()
+            print(f"{ad_soyad} başarıyla eklendi...")
+        except Exception as hata:
+            print(hata)
+            print("Beklenmeyen bir hata oluştu...")
+        self.seçim()
+    def sil(self):
+        sırası = int(input("Silmek istediğiniz kaydın sırasını giriniz: "))
+        try:
+            self.im.execute(f"""
+                    DELETE FROM kayıt_tablo WHERE sıra = {sırası}""")
+            self.vt.commit()
+            print("Kayıt başarıyla silindi")
+        except Exception as hata:
+            print(hata)
+            print("Beklenmeyen bir hata oluştu...")
+        self.seçim()
+    def listele(self):
+        try:
+            veri = self.im.execute("SELECT * FROM kayıt_tablo").fetchall()
+            for i in veri:
+                print(i)
+            print()
+        except:
+            print("Beklenmeyen bir hata oluştu...")
+        self.seçim()
+    def bul(self):
+        ara = input("İsim-Soyisime göre arama yap: ")
+        try:
+            veri = self.im.execute(f"""
+                    SELECT * FROM kayıt_tablo
+                    WHERE ad_soyad LIKE '%{ara}%'
+                            """).fetchall() # öncesi ve sonrası farketmez
+            for i in veri:
+                print(f"{i[0]}\t{i[1]}\t{i[2]}\t{i[3]}")
+        except Exception as hata:
+            print(hata)
+            print("Beklenmeyen bir hata oluştu...")
+        self.seçim()
+    def sutun_ekle(self):
+        s_ekle = input("Eklemek istediğiniz sutun başlığı: ")
+        try: 
+            self.im.execute(f"""
+                    ALTER TABLE kayıt_tablo ADD {s_ekle}
+                            """)
+            self.vt.commit()
+            print("Sutun başarıyla eklendi")
+        except Exception as hata:
+            print(hata)
+            print("Beklenmeyen bir hata oluştu...")
+        self.seçim()
+    def sutun_sil(self):
+        s_sil = input("Silmek istediğiniz sutun başlığı: ")
+        try: 
+            self.im.execute(f"""
+                    ALTER TABLE telefon_tablo DROP {s_sil}
+                            """)
+            self.vt.commit()
+            print("Sutun basarıyla silindi")
+        except Exception as hata:
+            print(hata)
+            print("Beklenmeyen bir hata oluştu...")
+        self.seçim()                            
+    def guncelle(self):
+        sırası = int(input("Güncelleme yapılacak kayıt sırası: "))
+        baslık = input("Güncelleme yapılacak başlık: ")
+        yeni = input("Güncelleme: ")
+        try:
+            self.im.execute(f"""
+                    UPDATE telefon_tablo SET {baslık} = '{yeni}' 
+                    WHERE sıra = {sırası}
+                            """)
+            self.vt.commit()
+            print("Kayıt başarıyla güncellendi")
+        except Exception as hata:
+            print(hata)
+            print("Beklenmeyen bir hata oluştu...") 
+        self.seçim()
