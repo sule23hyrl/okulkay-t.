@@ -111,7 +111,7 @@ class OkulKayıt():
         s_sil = input("Silmek istediğiniz sutun başlığı: ")
         try: 
             self.im.execute(f"""
-                    ALTER TABLE telefon_tablo DROP {s_sil}
+                    ALTER TABLE kayıt_tablo DROP {s_sil}
                             """)
             self.vt.commit()
             print("Sutun basarıyla silindi")
@@ -125,7 +125,7 @@ class OkulKayıt():
         yeni = input("Güncelleme: ")
         try:
             self.im.execute(f"""
-                    UPDATE telefon_tablo SET {baslık} = '{yeni}' 
+                    UPDATE kayıt_tablo SET {baslık} = '{yeni}' 
                     WHERE sıra = {sırası}
                             """)
             self.vt.commit()
@@ -134,3 +134,6 @@ class OkulKayıt():
             print(hata)
             print("Beklenmeyen bir hata oluştu...") 
         self.seçim()
+        listele()
+        def listele()
+        
